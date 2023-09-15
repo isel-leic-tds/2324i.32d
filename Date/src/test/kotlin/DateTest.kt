@@ -37,6 +37,9 @@ class DateTest{
     @Test fun `test Leap Year`(){
         val sut = Date(2020, 9,15)
         assertTrue(sut.leapYear)
+        //For demo purposes
+        assertTrue(sut.leapYear2())
+        assertTrue(sut.leapYear3())
     }
 
     @Test fun `test non Leap Year`(){
