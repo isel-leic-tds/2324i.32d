@@ -1,0 +1,39 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+hide empty members
+
++interface Stack {
+    +push(elem: T): Stack<T>
+    +top(): T
+    +pop(): Stack<T>
+    +isEmpty(): Boolean
+}
+
+-class Node<T> {
+    +elem: T
+    '+next: Node<T>
+}
+Node "0..1" <-- Node : +next
+
+-class StackNotEmpty<T> {
+    +push(elem: T)
+    +top()
+    +pop()
+    +isEmpty() = false
+}
+Stack <|.. StackNotEmpty
+Node <-- StackNotEmpty : -head
+'StackNotEmpty --> Node : -head
+
+-class StackEmpty <<(O,orange) object>>{
+    +push(elem: Any)
+    +top() = throw
+    +pop() = throw
+    +isEmpty() = true
+}
+Stack <|.. StackEmpty : T=Any
+
+StackEmpty .> StackNotEmpty : <<create>>
+StackEmpty <. StackNotEmpty : <<create>>
+@enduml
