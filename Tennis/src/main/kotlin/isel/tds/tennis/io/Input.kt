@@ -1,8 +1,7 @@
 package isel.tds.tennis.io
 
-enum class Player {
-    A, B
-}
+import isel.tds.tennis.Player
+
 
 fun readWinner(): Player {
     return Player.valueOf(readWinnerCharRecursive().toString())
