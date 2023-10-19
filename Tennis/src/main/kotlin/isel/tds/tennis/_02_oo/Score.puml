@@ -8,6 +8,9 @@ interface Score{
 }
 
 Score <|-- ByPoints
+Score <|-- Game
+Score <|-- Advantage
+Score <|-- Deuce
 
 enum Points{
    LOVE
@@ -24,9 +27,22 @@ enum Player{
 }
 
 class ByPoints {
-Points pointsA
-Points pointsB
+'+Points pointsA
+'+Points pointsB
+}
+ByPoints o-- Points : pointsA
+ByPoints o-- Points : pointsB
+
+class Deuce {
 }
 
+class Advantage {
+}
+
+class Game {
+}
+
+Game o-- Player: winner
+Advantage o-- Player: player
 
 @enduml

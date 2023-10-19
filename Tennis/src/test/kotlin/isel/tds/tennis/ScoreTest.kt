@@ -1,7 +1,12 @@
 package isel.tds.tennis
 
 //import isel.tds.tennis._01_singleclass.initialScore
-import isel.tds.tennis._02_oo.initialScore
+//import isel.tds.tennis._02_oo.initialScore
+//import isel.tds.tennis._03_pm.initialScore
+//import isel.tds.tennis._03_pm.isGame
+//import isel.tds.tennis._03_pm.next
+//import isel.tds.tennis._03_pm.placard
+import isel.tds.tennis._04_fp.initialScore
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
