@@ -46,5 +46,20 @@ class BoardTest{
         assertTrue(sut.isWinner('O'))
         assertFalse(sut.isDraw())
     }
+
+    @Test
+    fun `Test Row 2 X win`() {
+        val sut = Board(
+            listOf(
+                'X', 'X', ' ',
+                'X', 'O', 'X',
+                'O', 'O', 'O'
+            )
+        )
+
+        assertFalse(sut.isWinner('X'))
+        assertTrue(sut.isWinner('O'))
+        assertFalse(sut.isDraw())
+    }
     //TODO: add more tests
 }

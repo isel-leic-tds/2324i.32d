@@ -1,29 +1,36 @@
 import isel.tds.galo.model.*
+import isel.tds.galo.view.Command
+import isel.tds.galo.view.getCommands
+import isel.tds.galo.view.readCommandLine
+import isel.tds.galo.view.show
+import java.lang.IllegalArgumentException
+import java.lang.IllegalStateException
 
 fun main() {
 
     var board: Board? = null
-    while(board==null || (!board.isWinner('X') && !board.isWinner('O') )){
-        println(">")
-        val cmd = readln().uppercase().split(" ")
 
-        when (cmd[0]) {
-            "NEW" -> board = Board()
-            "EXIT" -> return
-            "PLAY" -> {
-                board?.let {
-                    val positionIdx = cmd[1].toInt()
-                    if (it.canPlay(positionIdx))
-                        board = board?.play(positionIdx)
-                    else
-                        println("Granda burro!!!!\njoga outra vez...")
-                }
+    val commands = getCommands()
+    while(true){
+        val (name,args)  = readCommandLine()
+        val cmd = commands[name]
+        if(cmd==null)println("Invalid Command $name")
+        else
+            try {
+                board = cmd.execute(args, board)
+            }catch (e: IllegalStateException){
+                println(e.message)
             }
-            else -> println("Invalid command ${cmd}")
-        }
+            catch (e: IllegalArgumentException){
+                println(e.message)
+            }
         board?.show()
     }
 }
+
+
+
+
 
 
 
