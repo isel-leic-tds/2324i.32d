@@ -17,6 +17,7 @@ fun main() {
         if(cmd==null)println("Invalid Command $name")
         else
             try {
+                if( cmd.isToFinish) break
                 board = cmd.execute(args, board)
             }catch (e: IllegalStateException){
                 println(e.message)
