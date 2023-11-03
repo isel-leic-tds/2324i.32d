@@ -1,0 +1,20 @@
+@startuml
+
+skinparam componentStyle rectangle
+
+package model{
+    [Board] ..>[Position]
+    [Board] ..>[Player]
+}
+
+package view{
+    [Command] ..> [Output]
+    [Input]
+
+}
+
+[Command]->[Board]
+[Output]->[Board]
+
+
+@enduml

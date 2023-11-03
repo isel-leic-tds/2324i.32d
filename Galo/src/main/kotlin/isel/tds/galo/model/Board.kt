@@ -5,8 +5,16 @@ const val BOARD_CELLS: Int = BOARD_SIZE * BOARD_SIZE
 
 
 typealias BoardCells = Map<Position,Player>
-sealed class Board(val boardCells: BoardCells)
-class BoardRun(boardCells: BoardCells, val turn: Player): Board(boardCells)
+sealed class Board(val boardCells: BoardCells){
+    override fun equals(other: Any?): Boolean {
+        return other is Board && boardCells == other.boardCells
+    }
+}
+class BoardRun(boardCells: BoardCells, val turn: Player): Board(boardCells){
+    override fun equals(other: Any?): Boolean {
+        return super.equals(other) && other is BoardRun && turn == other.turn
+    }
+}
 class BoardWin(boardCells: BoardCells, val winner: Player): Board(boardCells)
 class BoardDraw(boardCells: BoardCells) : Board(boardCells)
 
