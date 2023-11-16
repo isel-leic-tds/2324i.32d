@@ -12,7 +12,7 @@ import java.lang.IllegalStateException
 
 fun main() {
     MongoDriver("galo").use { driver ->
-        var game: Game = Game()
+        var clash: Clash = Clash()
 //    val storage = TextFileStorage<String, Game>("saves", GameSerializer)
         val storage = MongoStorage<String, Game>("saves", driver, GameSerializer)
         val commands = getCommands(storage)
@@ -24,17 +24,19 @@ fun main() {
             else
                 try {
                     if (cmd.isToFinish) break
-                    game = cmd.execute(args, game)
+                    clash = cmd.execute(args, clash)
                 } catch (e: IllegalStateException) {
                     println(e.message)
                 } catch (e: IllegalArgumentException) {
                     println(e.message)
                 }
-            game.show()
+            clash.show()
 
         }
     }
 }
+
+
 
 
 

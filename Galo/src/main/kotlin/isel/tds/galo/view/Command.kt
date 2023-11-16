@@ -38,8 +38,8 @@ fun getCommands(storage: Storage<String, Game>): Map<String, Command> {
         "SAVE" to object: Command(){
             override fun execute(args: List<String>, game: Game): Game{
                 require(args.isNotEmpty()) { "Missing name" }
-                requireNotNull(game.board){ "Game not started" }
-                val name = args[0]
+                        requireNotNull(game.board){ "Game not started" }
+                    val name = args[0]
                 require(name.isNotEmpty()) { "Name must not be empty" }
                 storage.create(name, game)
                 return game

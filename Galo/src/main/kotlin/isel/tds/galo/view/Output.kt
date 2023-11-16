@@ -41,3 +41,11 @@ fun Game.showScore() {
     }
     println()
 }
+
+private fun Clash.show() {
+    if (this is ClashRun) {
+        println("Clash: $id Player: $sidePlayer")
+        game.board?.show()
+    }
+    else println("Clash not started")
+}
