@@ -24,7 +24,7 @@ fun main() {
             if (cmd == null) println("Invalid Command $name")
             else
                 try {
-                    clash = cmd.execute(args, clash)
+                    clash = cmd.execute(clash, args)
                     if (cmd.isToFinish) break
                 } catch (e: IllegalStateException) {
                     println(e.message)
