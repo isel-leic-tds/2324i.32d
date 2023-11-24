@@ -1,0 +1,29 @@
+@startuml
+
+class Board
+
+enum Player{
+X, O
+}
+
+class Position{
+index: Int
+}
+
+Board --> "*" Cell : boardCells
+Cell --> Position: key
+Cell --> Player: value
+
+Board <|-- BoardRun
+Board <|-- BoardWin
+Board <|-- BoardDraw
+
+BoardWin --> Player
+BoardRun --> Player
+
+
+
+
+
+
+@enduml

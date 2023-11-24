@@ -1,4 +1,3 @@
-@file:OptIn(ExperimentalStdlibApi::class)
 
 package isel.tds.galo.model
 
@@ -8,5 +7,6 @@ enum class Player {
 }
 
 
+@OptIn(ExperimentalStdlibApi::class)
 fun String.toPlayerOrNull() = Player.entries.firstOrNull {it.name==this}
 fun String.toPlayer() = Player.valueOf(this )
