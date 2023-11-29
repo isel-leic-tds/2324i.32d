@@ -3,8 +3,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,50 +27,71 @@ val BOARD_SIDE = CELL_SIDE * BOARD_SIZE + GRID_THICKNESS* (BOARD_SIZE-1)
 @Composable
 @Preview
 fun FrameWindowScope.App(exitFunction: () -> Unit) {
-//    var player by remember { mutableStateOf(Player.X) }
-    var board by remember { mutableStateOf(Board()) }
+    var game by remember { mutableStateOf(Game()) }
+    var showScore by remember { mutableStateOf(false) }
     MenuBar  {
         Menu("Game") {
-            Item("New Board", onClick = { board = Board()})
+            Item("New Board", onClick = { game = game.newBoard()})
+            Item("Show Score", onClick = { showScore = true})
             Item("Exit", onClick = exitFunction)
         }
     }
     MaterialTheme {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             BoardView(
-                boardCells = board.boardCells,
+                boardCells = game.board?.boardCells,
                 onClick = {pos ->
-                    if(board is BoardRun)
-                        board = board.play(pos)
+                    if(game.board is BoardRun)
+                        game = game.play(pos)
                 })
-            StatusBar(board)
+            StatusBar(game.board)
         }
-    }
-}
-@Composable
-private fun FrameWindowScope.MenuActions(exitFunction: () -> Unit) {
-    MenuBar  {
-        Menu("Game") {
-            Item("New Board", onClick = { println("new board") })
-            Item("Exit", onClick = exitFunction)
-        }
+        if(showScore) ScoreDialog(game.score) { showScore = false }
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class, ExperimentalStdlibApi::class)
+@Composable
+fun ScoreDialog(score: Map<Player?, Int>, closeDialog: () -> Unit) =
+    AlertDialog(
+        onDismissRequest = closeDialog,
+        confirmButton = { TextButton(onClick=closeDialog){ Text("Close") } },
+        text = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column( horizontalAlignment = Alignment.CenterHorizontally){
+                    Player.entries.forEach { player ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Cell( player, size = 20.dp)
+                            Text(
+                                text = " - ${score[player]}",
+                                style = MaterialTheme.typography.h4
+                            )
+                        }
+                    }
+                    Text("Draws - ${score[null]}", style = MaterialTheme.typography.h4)
+                }
+            }
+        }
+    )
+
 
 @Composable
-fun StatusBar(board: Board) =
+fun StatusBar(board: Board?) =
     Row {
         val (txt, player) = when(board){
             is BoardRun -> "Turn:" to board.turn
             is BoardWin -> "Winner:" to board.winner
             is BoardDraw -> "Draw" to null
+            null -> "Game not started" to null
         }
         Text(text=txt, style=MaterialTheme.typography.h4 )
         Cell(player, size = 50.dp)
     }
 @Composable
-fun BoardView(boardCells: BoardCells, onClick: (Position)->Unit) =
+fun BoardView(boardCells: BoardCells?, onClick: (Position)->Unit) =
     Column(
         modifier = Modifier
             .background(Color.Black)
@@ -86,7 +106,7 @@ fun BoardView(boardCells: BoardCells, onClick: (Position)->Unit) =
                 repeat(BOARD_SIZE){col ->
                     val pos = Position(row, col)
                     Cell(
-                        boardCells[pos],
+                        boardCells?.get(pos),
                         onClick = { onClick(pos)} )
                 }
             }
