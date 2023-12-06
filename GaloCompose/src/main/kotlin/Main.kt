@@ -5,10 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,35 +15,35 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import isel.tds.galo.model.*
+import isel.tds.galo.viewmodel.AppViewModel
 
 
 val CELL_SIDE = 100.dp
 val GRID_THICKNESS = 5.dp
 val BOARD_SIDE = CELL_SIDE * BOARD_SIZE + GRID_THICKNESS* (BOARD_SIZE-1)
 
+
 @Composable
 @Preview
 fun FrameWindowScope.App(exitFunction: () -> Unit) {
-    var game by remember { mutableStateOf(Game()) }
-    var showScore by remember { mutableStateOf(false) }
+
+    val vm = remember { AppViewModel() }
+
     MenuBar  {
         Menu("Game") {
-            Item("New Board", onClick = { game = game.newBoard()})
-            Item("Show Score", onClick = { showScore = true})
+            Item("New Board", onClick = vm::newBoard)
+            Item("Show Score", onClick = vm::showScore)
             Item("Exit", onClick = exitFunction)
         }
     }
     MaterialTheme {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             BoardView(
-                boardCells = game.board?.boardCells,
-                onClick = {pos ->
-                    if(game.board is BoardRun)
-                        game = game.play(pos)
-                })
-            StatusBar(game.board)
+                boardCells = vm.game.board?.boardCells,
+                onClick = vm::play)
+            StatusBar(vm.game.board)
         }
-        if(showScore) ScoreDialog(game.score) { showScore = false }
+        if(vm.viewScore) ScoreDialog(vm.game.score, vm::hideScore)
     }
 }
 
@@ -140,7 +137,6 @@ fun main() = application {
         title = "Mega jogo galo",
         state = WindowState(size= DpSize.Unspecified)
     ) {
-//        MenuActions(::exitApplication)
         App(::exitApplication)
     }
 }
