@@ -14,7 +14,8 @@ class ClashRun(
 ): Clash(gs)
 
 
-fun ClashRun.play(toPosition: Position): Clash {
+fun Clash.play(toPosition: Position): Clash {
+    check(this is ClashRun) { "Clash not started" }
     check((game.board as BoardRun).turn == me) { "Not your turn" }
     val gameAfter = this.game.play(toPosition)
     gs.update(id, gameAfter)
@@ -39,6 +40,12 @@ fun ClashRun.refreshClash(): Clash {
 fun Clash.deleteIfIsOwner() {
     if (this is ClashRun && me==Player.X)
         gs.delete(id)
+}
+
+fun Clash.newBoard():Clash  {
+    check(this is ClashRun) { "Clash not started" }
+    val newGame = game.newBoard().also { gs.update(id,it) }
+    return ClashRun(gs, id, me, newGame)
 }
 
 

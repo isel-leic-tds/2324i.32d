@@ -4,8 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -15,7 +14,9 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import isel.tds.galo.model.*
+import isel.tds.galo.mongo.MongoDriver
 import isel.tds.galo.viewmodel.AppViewModel
+import isel.tds.galo.viewmodel.AppViewModel.InputName
 
 
 val CELL_SIDE = 100.dp
@@ -25,12 +26,15 @@ val BOARD_SIDE = CELL_SIDE * BOARD_SIZE + GRID_THICKNESS* (BOARD_SIZE-1)
 
 @Composable
 @Preview
-fun FrameWindowScope.App(exitFunction: () -> Unit) {
+fun FrameWindowScope.App(driver: MongoDriver, exitFunction: () -> Unit) {
 
-    val vm = remember { AppViewModel() }
+    val vm = remember { AppViewModel(driver) }
 
     MenuBar  {
         Menu("Game") {
+            Item("New Game", onClick = vm::showNewGameDialog)
+            Item("Join Game", onClick = vm::showJoinGameDialog)
+//            Item("Refresh", enabled = vm.hasClash, onClick = vm::refresh)
             Item("New Board", onClick = vm::newBoard)
             Item("Show Score", onClick = vm::showScore)
             Item("Exit", onClick = exitFunction)
@@ -39,13 +43,52 @@ fun FrameWindowScope.App(exitFunction: () -> Unit) {
     MaterialTheme {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             BoardView(
-                boardCells = vm.game.board?.boardCells,
+                boardCells = vm.board?.boardCells,
                 onClick = vm::play)
-            StatusBar(vm.game.board)
+            StatusBar(vm.board, vm.me)
         }
-        if(vm.viewScore) ScoreDialog(vm.game.score, vm::hideScore)
+        if(vm.viewScore){ ScoreDialog(vm.score, vm::hideScore)}
+        vm.inputName?.let{
+            StartOrJoinDialog(
+                type = it,
+                onCancel = vm::cancelInput,
+                onAction = if(it==InputName.NEW) vm::newGame else vm::joinGame
+            )
+        }
     }
 }
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun StartOrJoinDialog(
+    type: InputName,
+    onCancel: ()->Unit,
+    onAction: (String)->Unit) {
+
+    var name by remember { mutableStateOf("") }  // Name in edition
+    AlertDialog(
+            onDismissRequest = onCancel,
+            title = { Text(text = "Name to ${type.txt}",
+                    style = MaterialTheme.typography.h5
+                        )
+                    },
+            text = {
+                    OutlinedTextField(
+                        value = name,
+                        onValueChange = { name = it },
+                        label = { Text("Name of game") }
+                            )
+                   },
+            confirmButton = {
+                    TextButton(enabled = true,//Name.isValid(name),
+                            onClick = { onAction(name)}//Name(name)) }
+                        ) { Text(type.txt) }
+                },
+            dismissButton = {
+                    TextButton(onClick = onCancel){ Text("cancel") }
+                }
+    )
+}
+    
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalStdlibApi::class)
 @Composable
@@ -76,8 +119,13 @@ fun ScoreDialog(score: Map<Player?, Int>, closeDialog: () -> Unit) =
 
 
 @Composable
-fun StatusBar(board: Board?) =
+fun StatusBar(board: Board?, me: Player?) =
     Row {
+        me?.let{
+            Text("You ", style = MaterialTheme.typography.h4)
+            Cell(player = it, size=50.dp)
+            Spacer(Modifier.width(30.dp))
+        }
         val (txt, player) = when(board){
             is BoardRun -> "Turn:" to board.turn
             is BoardWin -> "Winner:" to board.winner
@@ -131,15 +179,18 @@ fun Cell(player: Player?, size: Dp = 100.dp, onClick: ()->Unit={}){
     }
 }
 
-fun main() = application {
-    Window(
-        onCloseRequest = ::exitApplication,
-        title = "Mega jogo galo",
-        state = WindowState(size= DpSize.Unspecified)
-    ) {
-        App(::exitApplication)
+fun main() =
+    MongoDriver("galo").use { driver ->
+        application {
+            Window(
+                onCloseRequest = ::exitApplication,
+                title = "Mega jogo galo",
+                state = WindowState(size = DpSize.Unspecified)
+            ) {
+                App(driver, ::exitApplication)
+            }
+        }
     }
-}
 
 
 

@@ -1,9 +1,10 @@
 package isel.tds.galo.model
 
+typealias Score = Map<Player?,Int>
 data class Game @OptIn(ExperimentalStdlibApi::class) constructor(
     val board: Board? = null,
     val firstPlayer: Player = Player.X,
-    val score: Map<Player?,Int> = (Player.entries + null).associateWith{0}
+    val score: Score = (Player.entries + null).associateWith{0}
     )
 
 fun Game.play(pos: Position): Game {
