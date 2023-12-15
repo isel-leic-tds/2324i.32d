@@ -18,26 +18,31 @@ class AppViewModel(driver: MongoDriver) {
         private set
     var inputName by mutableStateOf<InputName?>(null)
         private set
+    var errorMessage by mutableStateOf<String?>(null) //ErrorDialog state
+        private set
 
     val board: Board? get() = (clash as? ClashRun)?.game?.board
     val score: Score get() = (clash as ClashRun).game.score
 
     val me: Player? get() = (clash as? ClashRun)?.me
 
+    val hasClash: Boolean get() = clash is ClashRun
+    val newAvailable: Boolean get() = clash.canNewBoard()
+
     fun newBoard(){ clash = clash.newBoard() }
 
     fun showScore(){ viewScore = true}
     fun hideScore(){ viewScore = false}
 
-    fun play(pos: Position){
-//        if(game.board is BoardRun)
-//            game = game.play(pos)
-        clash = clash.play(pos)
-    }
+    fun hideError() { errorMessage = null }
 
-//    fun startGame(){
-//        clash = clash.startClash("game")
-//    }
+    fun play(pos: Position){
+        try {
+            clash = clash.play(pos)
+        } catch (e: Exception) {
+            errorMessage = e.message
+        }
+    }
 
     enum class InputName(val txt: String)
     { NEW("Start"), JOIN("Join") }
@@ -53,7 +58,17 @@ class AppViewModel(driver: MongoDriver) {
         inputName = null
     }
 
+    fun refreshGame() {
+        try {
+            clash = clash.refreshClash()
+        } catch (e: Exception) {
+            errorMessage = e.message
+        }
+    }
+
     fun showNewGameDialog() { inputName = InputName.NEW }
     fun showJoinGameDialog() { inputName = InputName.JOIN }
+
+    fun exit() { clash.deleteIfIsOwner() }
 
 }

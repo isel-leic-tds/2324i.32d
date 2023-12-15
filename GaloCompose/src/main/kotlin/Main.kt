@@ -34,10 +34,10 @@ fun FrameWindowScope.App(driver: MongoDriver, exitFunction: () -> Unit) {
         Menu("Game") {
             Item("New Game", onClick = vm::showNewGameDialog)
             Item("Join Game", onClick = vm::showJoinGameDialog)
-//            Item("Refresh", enabled = vm.hasClash, onClick = vm::refresh)
-            Item("New Board", onClick = vm::newBoard)
-            Item("Show Score", onClick = vm::showScore)
-            Item("Exit", onClick = exitFunction)
+            Item("Refresh", enabled = vm.hasClash, onClick = vm::refreshGame)//
+            Item("New Board", enabled= vm.newAvailable, onClick = vm::newBoard)
+            Item("Show Score", enabled = vm.hasClash, onClick = vm::showScore)
+            Item("Exit", onClick = { vm.exit(); exitFunction() })
         }
     }
     MaterialTheme {
@@ -55,8 +55,28 @@ fun FrameWindowScope.App(driver: MongoDriver, exitFunction: () -> Unit) {
                 onAction = if(it==InputName.NEW) vm::newGame else vm::joinGame
             )
         }
+        vm.errorMessage?.let { ErrorDialog(it, onClose = vm::hideError) }
     }
 }
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun DialogBase(
+    title: String,
+    onClose: ()->Unit,
+    content: @Composable ()->Unit
+) = AlertDialog(
+    onDismissRequest = onClose,
+    title = { Text(title, style = MaterialTheme.typography.h4) },
+    text = content,
+    confirmButton = { TextButton(onClick = onClose) { Text("Close") } }
+)
+
+
+@Composable
+fun ErrorDialog(message: String, onClose: ()->Unit) =
+    DialogBase("Error", onClose) {
+        Text(message, style = MaterialTheme.typography.h6)
+    }
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun StartOrJoinDialog(

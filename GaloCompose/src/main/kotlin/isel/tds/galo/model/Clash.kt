@@ -32,7 +32,8 @@ fun Clash.joinClash(name: String): Clash {
     val game = gs.read(name) ?: error("Clash $name not found")
     return ClashRun( gs, name, Player.O, game)
 }
-fun ClashRun.refreshClash(): Clash {
+fun Clash.refreshClash(): Clash {
+    check(this is ClashRun) { "Clash not started" }
     val game = gs.read(id) ?: error("Clash $id not found")
     return ClashRun( gs, id, me, game)
 }
@@ -48,4 +49,4 @@ fun Clash.newBoard():Clash  {
     return ClashRun(gs, id, me, newGame)
 }
 
-
+fun Clash.canNewBoard() = this is ClashRun && game.board is BoardWin
