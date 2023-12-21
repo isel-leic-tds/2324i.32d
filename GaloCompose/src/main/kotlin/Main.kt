@@ -27,14 +27,14 @@ val BOARD_SIDE = CELL_SIDE * BOARD_SIZE + GRID_THICKNESS* (BOARD_SIZE-1)
 @Composable
 @Preview
 fun FrameWindowScope.App(driver: MongoDriver, exitFunction: () -> Unit) {
-
-    val vm = remember { AppViewModel(driver) }
+    val scope = rememberCoroutineScope()
+    val vm = remember { AppViewModel(driver, scope) }
 
     MenuBar  {
         Menu("Game") {
             Item("New Game", onClick = vm::showNewGameDialog)
             Item("Join Game", onClick = vm::showJoinGameDialog)
-            Item("Refresh", enabled = vm.hasClash, onClick = vm::refreshGame)//
+//            Item("Refresh", enabled = vm.hasClash, onClick = vm::refreshGame)//
             Item("New Board", enabled= vm.newAvailable, onClick = vm::newBoard)
             Item("Show Score", enabled = vm.hasClash, onClick = vm::showScore)
             Item("Exit", onClick = { vm.exit(); exitFunction() })
@@ -56,8 +56,17 @@ fun FrameWindowScope.App(driver: MongoDriver, exitFunction: () -> Unit) {
             )
         }
         vm.errorMessage?.let { ErrorDialog(it, onClose = vm::hideError) }
+        if(vm.isWaiting) waitingIndicator()
     }
 }
+
+@Composable
+fun waitingIndicator() = CircularProgressIndicator(
+    Modifier.fillMaxSize().padding(30.dp),
+    strokeWidth = 15.dp
+)
+
+
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DialogBase(

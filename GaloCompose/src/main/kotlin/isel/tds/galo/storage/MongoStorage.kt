@@ -2,6 +2,8 @@ package isel.tds.galo.storage
 
 import com.mongodb.MongoWriteException
 import isel.tds.galo.mongo.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class MongoStorage<Key, Data>(
     collectionName: String,
@@ -29,7 +31,6 @@ class MongoStorage<Key, Data>(
         docs.getDocument(key.toString())?.let {
             serializer.deserialize(it.data)
         }
-
 
     override fun update(key: Key, data: Data) {
         check(docs.replaceDocument(key.toString(), Doc(key, data)))

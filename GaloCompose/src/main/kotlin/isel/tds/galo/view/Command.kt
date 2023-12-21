@@ -44,10 +44,10 @@ fun getCommands(): Map<String, Command> {
                 val name = requireNotNull(args.firstOrNull()) { "Missing name" }
                 this.joinClash(name)
         },
-        "REFRESH" to Command{_ ->
-                check(this is ClashRun ){"Game not started"}
-                this.refreshClash()
-        },
+//        "REFRESH" to Command{_ ->
+//                check(this is ClashRun ){"Game not started"}
+//                this.refreshClash()
+//        },
     )
 }
 
